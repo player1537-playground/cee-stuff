@@ -1,0 +1,3 @@
+#!/usr/bin/X11/cpp
+
+#define APPLY(fun, ...) fun(__VA_ARGS__)

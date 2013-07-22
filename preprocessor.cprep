@@ -1,0 +1,102 @@
+#!/usr/bin/cpp
+
+#include "utils.cprep"
+#include "inc.cprep"
+#include "decr.cprep"
+#include "map.cprep"
+#include "loop.cprep"
+
+#define GET_2(_1, N, ...) N
+#define COMMA() ,
+#define NO_COMMA() 
+#define HAS_COMMA(a, ...) HAS_COMMA__(HAS_COMMA_##a, COMMA)
+#define HAS_COMMA_ , NO_COMMA
+#define HAS_COMMA__(...) GET_2(__VA_ARGS__)()
+#define LEN(...) LEN_(__VA_ARGS__ HAS_COMMA(__VA_ARGS__) 100,99,98,97,96,95,94,93,92,91,90,89,88,87,86,85,84,83,82,81,80,79,78,77,76,75,74,73,72,71,70,69,68,67,66,65,64,63,62,61,60,59,58,57,56,55,54,53,52,51,50,49,48,47,46,45,44,43,42,41,40,39,38,37,36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0)
+#define LEN_(...) LEN__(__VA_ARGS__)
+#define LEN__(_100,_99,_98,_97,_96,_95,_94,_93,_92,_91,_90,_89,_88,_87,_86,_85,_84,_83,_82,_81,_80,_79,_78,_77,_76,_75,_74,_73,_72,_71,_70,_69,_68,_67,_66,_65,_64,_63,_62,_61,_60,_59,_58,_57,_56,_55,_54,_53,_52,_51,_50,_49,_48,_47,_46,_45,_44,_43,_42,_41,_40,_39,_38,_37,_36,_35,_34,_33,_32,_31,_30,_29,_28,_27,_26,_25,_24,_23,_22,_21,_20,_19,_18,_17,_16,_15,_14,_13,_12,_11,_10,_9,_8,_7,_6,_5,_4,_3,_2,_1, N, ...) N
+
+#define A LIST(1,2,3)
+A == 1,2,3
+HEAD(A) == 1
+TAIL(A) == 2,3
+<HEAD(ZERO)> == <>
+<TAIL(ZERO)> == <>
+
+LIST(LIST(1,2,3),LIST(4,5,6))
+
+#define X APPEND(LIST(1,2,3),LIST(4,5,6))
+LEN(X) == 6
+LEN(ZERO) == 0
+LEN() == 0
+
+#define IS_ZERO(a) IS_ZERO_(IS_ZERO_HELPER_##a, IS_ZERO_ZERO)
+#define IS_ZERO_(...) GET_2(__VA_ARGS__)()
+#define IS_ZERO_ZERO() 0
+#define IS_ZERO_ONE() 1
+#define IS_ZERO_HELPER_0 ,IS_ZERO_ONE
+
+IS_ZERO(1)
+IS_ZERO(5)
+IS_ZERO(0)
+
+#define SWITCH_ZERO(n, zero, nonzero) SWITCH_ZERO_(zero, nonzero, JOIN(SWITCH_ZERO_, n), SWITCH_ZERO_GET_SECOND)
+#define SWITCH_ZERO_(zero, nonzero, ...) SWITCH_ZERO__(zero, nonzero, GET_2(__VA_ARGS__,,,))
+#define SWITCH_ZERO__(zero, nonzero, getwhich) APPLY(getwhich, zero, nonzero)
+#define SWITCH_ZERO_0 ,SWITCH_ZERO_GET_FIRST
+#define SWITCH_ZERO_NONZERO(x) 
+#define SWITCH_ZERO_GET_FIRST(a, b) a
+#define SWITCH_ZERO_GET_SECOND(a, b) b
+
+#define a(x) x##x
+#define b(x) x##x##x
+
+SWITCH_ZERO(0, a, b)(rawr)
+SWITCH_ZERO(1, a, b)(rawr)
+SWITCH_ZERO(rawr, a, b)(rawr)
+
+MAP(INC, LIST(1, 2, 3, 4))
+MAP(INC, LIST(5, 6, 7))
+MAP(INC, LIST(8, 9))
+MAP(INC, LIST(10))
+MAP(INC, LIST())
+
+JOIN(IS_ZERO_HELPER, 5)
+
+LOOP(5, INC, 3)
+
+#define ADD(a, b) APPLY(LOOP, a, INC, b)
+
+LOOP(2, INC, ADD(2, ADD(3, 5)))
+/*
+#define DECR(x) APPLY(GET_2, LOOP(x, DECR_HELPER, 0, 0))
+#define DECR_HELPER(a, ...) INC(a), a
+Decr!
+DECR(5)
+DECR(1)
+DECR(0)
+*/
+
+#define SUB(a, b) APPLY(LOOP, b, DECR, a)
+SUB(5, 3)
+
+#define X(a) APPLY(ADD, 5, a)
+EVAL(LOOP(3, X, 0))
+
+#define EMPTY(...) 
+#define EXPAND(...) __VA_ARGS__
+#define DEFER(id) id EMPTY()
+#define WHEN(c) SWITCH_ZERO(c, EMPTY, EXPAND)
+#define REPEAT(n, fun, ...) WHEN(n)(DEFER(REPEAT_INDIRECT)()(DECR(n), fun, __VA_ARGS__) DEFER(fun)(DECR(n), __VA_ARGS__))
+#define REPEAT_INDIRECT() REPEAT
+
+#define funn(n, ...) n##n
+REPEAT(5, funn, rawr)
+EVAL(EXPAND(EXPAND(EXPAND(EXPAND(EXPAND(EXPAND(REPEAT(5, funn, rawr))))))))
+EXPAND(EXPAND(EXPAND(EXPAND(EXPAND(REPEAT(5, funn, rawr))))))
+EVAL(REPEAT(5, funn, rawr))
+
+EXPAND ( 00) 11
+
+DECR(DECR(5))
+
